@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/toronto_film_fest/static/css/main.dcba4802.chunk.css",
+    "main.js": "/toronto_film_fest/static/js/main.ab5d93c2.chunk.js",
+    "main.js.map": "/toronto_film_fest/static/js/main.ab5d93c2.chunk.js.map",
+    "runtime~main.js": "/toronto_film_fest/static/js/runtime~main.492d511d.js",
+    "runtime~main.js.map": "/toronto_film_fest/static/js/runtime~main.492d511d.js.map",
+    "static/js/2.50f5a3e5.chunk.js": "/toronto_film_fest/static/js/2.50f5a3e5.chunk.js",
+    "static/js/2.50f5a3e5.chunk.js.map": "/toronto_film_fest/static/js/2.50f5a3e5.chunk.js.map",
+    "index.html": "/toronto_film_fest/index.html",
+    "precache-manifest.9d0c4fccbedce9309cc3b7ef14d8f603.js": "/toronto_film_fest/precache-manifest.9d0c4fccbedce9309cc3b7ef14d8f603.js",
+    "service-worker.js": "/toronto_film_fest/service-worker.js",
+    "static/css/main.dcba4802.chunk.css.map": "/toronto_film_fest/static/css/main.dcba4802.chunk.css.map"
+  }
+}
