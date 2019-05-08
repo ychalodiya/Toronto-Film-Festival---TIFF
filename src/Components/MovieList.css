@@ -1,0 +1,25 @@
+.imgDiv{
+    width: 20%;
+    margin: 10px;
+    padding-top: 18px;
+}
+
+.contentDiv{
+    width: 60%;
+    text-align: left;
+}
+
+.movieCard{
+    display: flex;
+    border: 2px dashed #bebebe;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.movieListComponent{
+    text-align: center;
+}
+
+.description{
+    font-weight: 700;
+}

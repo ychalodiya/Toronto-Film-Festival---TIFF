@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import './MovieList.css';
+
 import axios from 'axios';
 
 const TORONTO_MOVIE_FEST_API_KEY = process.env.REACT_APP_TORONTO_MOVIE_FEST_API_KEY;
@@ -27,12 +29,23 @@ class MovieList extends Component {
                 page
             }
         });
+
         // console.log(movieData.data);
+        let arr = [];
         const { results } = movieData.data;
-        console.log(results)
+        let data = results.filter(i => {
+            let year2019 = new Date(i.release_date).getFullYear();
+            if( year2019 === 2019) {
+                arr.push(i);
+                return arr
+            }
+        });
+
+        console.log(data);
+
         this.setState({
-            movies: results
-        })
+            movies: arr
+        }); 
     }
 
     renderLoader() {
@@ -41,29 +54,38 @@ class MovieList extends Component {
 
     renderMovies() {
         const { movies } = this.state;
-
         const movieHTML = movies.map( item => {
-            const { 
-                original_title: movieName,
-                overview: description,
-                popularity,
-                release_date,
-                poster_path: image,
-                id
-            } = item;
+        const { 
+            original_title: movieName,
+            overview: description,
+            popularity,
+            release_date,
+            poster_path: image,
+            id
+        } = item;
 
-            return(
-                <div 
-                    key= {id}
-                    className= "movieCard"
-                >
-                <h2> Movie Name: { movieName }</h2>
-                <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${image}`} alt="" />
-                <h4> Release Date: { release_date } </h4>
-                <h4> Popularity: { popularity }</h4>
-                <p> Description: { description }</p>
-                </div>
-            );
+            // if popularity is less than 10 than it's won't render the data
+            if(popularity > 10) {
+                return(
+                    <div 
+                        key= {id}
+                        className= "movieCard"
+                        onClick = {() => {
+                            this.props.setSelectedMovie(id)
+                        }}
+                    >
+                    <div className="imgDiv">
+                        <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${image}`} alt="" />
+                    </div>
+                    <div className="contentDiv">
+                        <h2 className="movieName"> Movie Name: { movieName }</h2>
+                        <h4> Release Date: { release_date } </h4>
+                        <h4> Popularity: { popularity }</h4>
+                        <p><span className="description">Description:</span> { description }</p>
+                    </div>
+                    </div>
+                );
+            }
         });
         return movieHTML;
     }

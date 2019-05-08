@@ -5,6 +5,7 @@ import './App.css';
 import Header from './Components/Header';
 import Footer from './Components/Footer';
 import MovieList from './Components/MovieList';
+// import MovieCard from './Components/MovieCard';
 
 // https://api.themoviedb.org/3/movie/550?api_key=d1533d4ca4c407672b61788a01df4c08
 
@@ -15,6 +16,12 @@ class App extends Component {
       Selected_Movie_ID : null
     };
   }
+  setSelectedMovie = (movieID) => {
+    // console.log(movieID);
+    this.setState({
+      Selected_Movie_ID: movieID
+    });
+  }
 
   render() {
     return (
@@ -22,7 +29,8 @@ class App extends Component {
         <main>
           <Header title= "Toronto Movie Festival" message= "Browse you're favorite movie from here." />
           <main>
-            <MovieList />
+            <MovieList setSelectedMovie = { this.setSelectedMovie }/>
+            {/* <MovieCard Selected_Movie_ID = { this.state.Selected_Movie_ID }/> */}
           </main>
           <Footer />
         </main>
