@@ -21,27 +21,33 @@ class MovieList extends Component {
     }
 
     async getMovieData() {
-        const page = 1;
-        const movieData = await axios.get('https://api.themoviedb.org/3/trending/movie/day',{
-            params : {
-                api_key : TORONTO_MOVIE_FEST_API_KEY,
-                language,
-                page
-            }
-        });
-
-        // console.log(movieData.data);
         let arr = [];
-        const { results } = movieData.data;
-        let data = results.filter(i => {
-            let year2019 = new Date(i.release_date).getFullYear();
-            if( year2019 === 2019) {
-                arr.push(i);
-                return arr
-            }
-        });
 
-        console.log(data);
+        // it will make 40 request becuase of limit and store the results into an array
+        for(let i=1; i<39; i++){
+            const movieData = await axios.get('https://api.themoviedb.org/3/trending/movie/day',{
+                params : {
+                    api_key : TORONTO_MOVIE_FEST_API_KEY,
+                    language,
+                    page: i
+                }
+            });
+
+            const { results } = movieData.data;
+            let data = results.filter(index => {
+                let year2019 = new Date(index.release_date).getFullYear();
+                if( year2019 === 2019) {
+                    arr.push(index);
+                    return arr
+                }
+            });
+        }
+
+        // sort the movie by releasing date
+        arr.sort(function(a, b){
+            let date1 = new Date(a.release_date),date2 = new Date(b.release_date)
+            return date1 - date2
+        });
 
         this.setState({
             movies: arr
