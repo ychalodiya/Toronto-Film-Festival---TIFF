@@ -5,7 +5,7 @@ import './App.css';
 import Header from './Components/Header';
 import Footer from './Components/Footer';
 import MovieList from './Components/MovieList';
-// import MovieCard from './Components/MovieCard';
+import MovieCard from './Components/MovieCard';
 
 // https://api.themoviedb.org/3/movie/550?api_key=d1533d4ca4c407672b61788a01df4c08
 
@@ -27,7 +27,7 @@ class App extends Component {
     return (
       <div>
         <main>
-          <Header title= "Toronto Movie Festival" message= "Browse you're favorite movie from here." />
+          <Header title= "Toronto International Film Festival" />
           <main>
             <MovieList setSelectedMovie = { this.setSelectedMovie }/>
             {/* <MovieCard Selected_Movie_ID = { this.state.Selected_Movie_ID }/> */}

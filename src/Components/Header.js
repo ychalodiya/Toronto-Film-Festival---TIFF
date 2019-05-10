@@ -2,7 +2,7 @@ import React from 'react';
 
 function Header(props) {
     // Default Message if not assign new one
-    const message = props.message ? props.message : 'Welcome To The Movie Festival';
+    const message = props.message ? props.message : 'Welcome To The Film Festival';
 
     return (
         <header className= "headerComponent">

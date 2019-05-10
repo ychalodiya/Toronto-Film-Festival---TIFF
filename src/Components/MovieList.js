@@ -24,7 +24,7 @@ class MovieList extends Component {
         let arr = [];
 
         // it will make 40 request becuase of limit and store the results into an array
-        for(let i=1; i<39; i++){
+        for(let i=1; i< 39; i++){
             const movieData = await axios.get('https://api.themoviedb.org/3/trending/movie/day',{
                 params : {
                     api_key : TORONTO_MOVIE_FEST_API_KEY,
@@ -36,7 +36,7 @@ class MovieList extends Component {
             const { results } = movieData.data;
             let data = results.filter(index => {
                 let year2019 = new Date(index.release_date).getFullYear();
-                if( year2019 === 2019) {
+                if( year2019 === 2019 && index.original_language == 'en') {
                     arr.push(index);
                     return arr
                 }
@@ -57,7 +57,34 @@ class MovieList extends Component {
     renderLoader() {
         return <p> ...Loading </p>
     }
+    SelectedMovie = async(ID) => {
+        const cast = await axios.get(`https://api.themoviedb.org/3/movie/${ID}/credits`,{
+            params : {
+                api_key: TORONTO_MOVIE_FEST_API_KEY
+            }
+        });
 
+        const castHTML = cast.data.cast.map( item => {
+        const {character, id, name, profile_path:castimg } = item;
+            // Display Cast only if Image source is available
+            if(castimg){
+                return(
+                    `<span>
+                        <img src="https://image.tmdb.org/t/p/w66_and_h66_face/${castimg}"
+                        alt="${name}" />
+                    </span>    
+                `
+                );
+            }
+        });
+        let castHeader = document.createElement('h4');
+        castHeader.innerText ='Cast:';
+        document.getElementById(ID).appendChild(castHeader);
+
+        let castContainer = document.createElement('div');
+        castContainer.innerHTML = castHTML;
+        document.getElementById(ID).appendChild(castContainer);
+    }
     renderMovies() {
         const { movies } = this.state;
         const movieHTML = movies.map( item => {
@@ -73,22 +100,23 @@ class MovieList extends Component {
             // if popularity is less than 10 than it's won't render the data
             if(popularity > 10) {
                 return(
-                    <div 
-                        key= {id}
-                        className= "movieCard"
-                        onClick = {() => {
-                            this.props.setSelectedMovie(id)
-                        }}
+                    <div key= {id} className= "movieCard"
+                        onClick = {
+                            () => {
+                                this.SelectedMovie(id)
+                            }
+                        }
                     >
-                    <div className="imgDiv">
-                        <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${image}`} alt="" />
-                    </div>
-                    <div className="contentDiv">
-                        <h2 className="movieName"> Movie Name: { movieName }</h2>
-                        <h4> Release Date: { release_date } </h4>
-                        <h4> Popularity: { popularity }</h4>
-                        <p><span className="description">Description:</span> { description }</p>
-                    </div>
+                        <div className="imgDiv">
+                            <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${image}`} alt="" />
+                        </div>
+                        <div className="contentDiv" >
+                            <h2 className="movieName"> Movie Name: { movieName }</h2>
+                            <h4> Release Date: { release_date } </h4>
+                            <h4> Popularity: { popularity }</h4>
+                            <p><span className="description">Description:</span> { description }</p>
+                            <div id={id}></div>
+                        </div>
                     </div>
                 );
             }
@@ -99,7 +127,7 @@ class MovieList extends Component {
     render() {
         return (
             <section className= "movieListComponent">
-                <h2> Here's The Movie List </h2>
+                <h2> -:Here's The List Of Movie:- </h2>
                 <div className= "movieList">
                     {
                         this.state.movies.length
@@ -107,9 +135,10 @@ class MovieList extends Component {
                         : this.renderLoader()
                     }   
                 </div>
+                <input type="button" value="load more..." onClick={this.loadmore}/>
             </section>
         )
     }
-
 }
+
 export default MovieList;
