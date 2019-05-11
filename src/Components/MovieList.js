@@ -57,33 +57,40 @@ class MovieList extends Component {
     renderLoader() {
         return <p> ...Loading </p>
     }
-    SelectedMovie = async(ID) => {
-        const cast = await axios.get(`https://api.themoviedb.org/3/movie/${ID}/credits`,{
-            params : {
-                api_key: TORONTO_MOVIE_FEST_API_KEY
-            }
-        });
+    SelectedMovie = async(ID, e) => {
+        let flag = document.getElementById(ID);
+        let ans = flag.hasChildNodes();
+        // Render Cast Container only once.
+        if(!ans){
+            const cast = await axios.get(`https://api.themoviedb.org/3/movie/${ID}/credits`,{
+                params : {
+                    api_key: TORONTO_MOVIE_FEST_API_KEY
+                }
+            });
+    
+            const castHTML = cast.data.cast.map( item => {
+            const {character, id, name, profile_path:castimg } = item;
+                // Display Cast only if Image source is available
+                if(castimg){
+                    return(
+                        `<span>
+                            <img src="https://image.tmdb.org/t/p/w66_and_h66_face/${castimg}"
+                            alt="${name}" title="${name}"/>
+                        </span>`
+                    );
+                }
+            });
+            let castHeader = document.createElement('h4');
+            castHeader.innerText ='Cast:';
+            document.getElementById(ID).appendChild(castHeader);
+    
+            let castContainer = document.createElement('div');
+            castContainer.innerHTML = castHTML;
+            document.getElementById(ID).appendChild(castContainer);
+        }
 
-        const castHTML = cast.data.cast.map( item => {
-        const {character, id, name, profile_path:castimg } = item;
-            // Display Cast only if Image source is available
-            if(castimg){
-                return(
-                    `<span>
-                        <img src="https://image.tmdb.org/t/p/w66_and_h66_face/${castimg}"
-                        alt="${name}" />
-                    </span>    
-                `
-                );
-            }
-        });
-        let castHeader = document.createElement('h4');
-        castHeader.innerText ='Cast:';
-        document.getElementById(ID).appendChild(castHeader);
 
-        let castContainer = document.createElement('div');
-        castContainer.innerHTML = castHTML;
-        document.getElementById(ID).appendChild(castContainer);
+       // e.target.removeEventListner(e.type);
     }
     renderMovies() {
         const { movies } = this.state;
@@ -102,8 +109,8 @@ class MovieList extends Component {
                 return(
                     <div key= {id} className= "movieCard"
                         onClick = {
-                            () => {
-                                this.SelectedMovie(id)
+                            (e) => {
+                                this.SelectedMovie(id, e); 
                             }
                         }
                     >
