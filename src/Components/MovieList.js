@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import './MovieList.css';
-
 import axios from 'axios';
 
 const TORONTO_MOVIE_FEST_API_KEY = process.env.REACT_APP_TORONTO_MOVIE_FEST_API_KEY;
 const language = 'en-US';
+
+let arr =[];
 
 class MovieList extends Component {
 
@@ -19,35 +20,30 @@ class MovieList extends Component {
         // requesting data using the following function
         this.getMovieData();
     }
-
+    
     async getMovieData() {
-        let arr = [];
+        // let arr = [];
 
         // it will make 40 request becuase of limit and store the results into an array
+
         for(let i=1; i< 39; i++){
-            const movieData = await axios.get('https://api.themoviedb.org/3/trending/movie/day',{
+            const movieData = await axios.get(`https://api.themoviedb.org/3/discover/movie`,{
                 params : {
-                    api_key : TORONTO_MOVIE_FEST_API_KEY,
+                    api_key: TORONTO_MOVIE_FEST_API_KEY,
+                    page: i,
                     language,
-                    page: i
+                    sort_by: 'primary_release_date.asc',
+                    'primary_release_date.gte': '2019-01-01',
+                    with_original_language: 'en'
                 }
             });
 
             const { results } = movieData.data;
             let data = results.filter(index => {
-                let year2019 = new Date(index.release_date).getFullYear();
-                if( year2019 === 2019 && index.original_language == 'en') {
                     arr.push(index);
-                    return arr
-                }
+                    return arr   
             });
         }
-
-        // sort the movie by releasing date
-        arr.sort(function(a, b){
-            let date1 = new Date(a.release_date),date2 = new Date(b.release_date)
-            return date1 - date2
-        });
 
         this.setState({
             movies: arr
@@ -57,6 +53,16 @@ class MovieList extends Component {
     renderLoader() {
         return <p> ...Loading </p>
     }
+
+    // It will convert minutes into hours and minutes
+    runtimeConverter(time) {
+        let hours = (time / 60);
+        let roundedHours = Math.floor(hours);
+        let minutes = (hours - roundedHours) * 60;
+        let roundedMinutes = Math.round(minutes);
+        return roundedHours + " Hour(s) and "+ roundedMinutes + " minute(s)";
+    }
+
     SelectedMovie = async(ID, e) => {
         let flag = document.getElementById(ID);
         let ans = flag.hasChildNodes();
@@ -67,9 +73,46 @@ class MovieList extends Component {
                     api_key: TORONTO_MOVIE_FEST_API_KEY
                 }
             });
-    
+
+            const tagline_and_runtime = await axios.get(`https://api.themoviedb.org/3/movie/${ID}`,{
+                params : {
+                    api_key : TORONTO_MOVIE_FEST_API_KEY,
+                    language
+                }
+            });
+
+            const {tagline, runtime, genres} = tagline_and_runtime.data;
+            
+            let taglineHeader = document.createElement('h4');
+            taglineHeader.innerText = 'Tagline: ';
+            document.getElementById(ID).appendChild(taglineHeader);
+
+            let taglineContainer = document.createElement('span');
+            taglineContainer.innerHTML = tagline;
+            taglineHeader.appendChild(taglineContainer);
+
+            let runtimeHeader = document.createElement('h4');
+            runtimeHeader.innerText = 'Runtime: ';
+            document.getElementById(ID).appendChild(runtimeHeader);
+
+            let runtimeContainer = document.createElement('span');
+            runtimeContainer.innerHTML = this.runtimeConverter(runtime);
+            runtimeHeader.appendChild(runtimeContainer);
+
+            let genreHeader = document.createElement('h4');
+            genreHeader.innerText = 'Genres: ';
+            document.getElementById(ID).appendChild(genreHeader);
+
+            const genreHTML = genres.map( item => {
+                return  item.name;
+            });
+
+            let genreContainer = document.createElement('span');
+            genreContainer.innerHTML = genreHTML.join(", ");
+            genreHeader.appendChild(genreContainer);
+
             const castHTML = cast.data.cast.map( item => {
-            const {character, id, name, profile_path:castimg } = item;
+            const {name, profile_path:castimg } = item;
                 // Display Cast only if Image source is available
                 if(castimg){
                     return(
@@ -80,21 +123,19 @@ class MovieList extends Component {
                     );
                 }
             });
+
             let castHeader = document.createElement('h4');
             castHeader.innerText ='Cast:';
             document.getElementById(ID).appendChild(castHeader);
     
             let castContainer = document.createElement('div');
-            castContainer.innerHTML = castHTML;
+            castContainer.innerHTML = castHTML.join(" ");
             document.getElementById(ID).appendChild(castContainer);
         }
-
-
-       // e.target.removeEventListner(e.type);
     }
     renderMovies() {
         const { movies } = this.state;
-        const movieHTML = movies.map( item => {
+        const movieHTML = movies.map( (item, index) => {
         const { 
             original_title: movieName,
             overview: description,
@@ -120,7 +161,6 @@ class MovieList extends Component {
                         <div className="contentDiv" >
                             <h2 className="movieName"> Movie Name: { movieName }</h2>
                             <h4> Release Date: { release_date } </h4>
-                            <h4> Popularity: { popularity }</h4>
                             <p><span className="description">Description:</span> { description }</p>
                             <div id={id}></div>
                         </div>

@@ -23,3 +23,10 @@
 .description{
     font-weight: 700;
 }
+h4 > span {
+    font-weight: 100;
+}
+h4{
+    margin-block-end: .45em;
+    margin-block-start: .75em;
+}
