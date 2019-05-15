@@ -12,21 +12,20 @@ class MovieList extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            movies: []
+            movies: [],
+            start: 1
         };
     }
 
     componentDidMount() {
         // requesting data using the following function
-        this.getMovieData();
+        this.getMovieData(this.state.start);
     }
     
-    async getMovieData() {
-        // let arr = [];
-
+    async getMovieData(start) {
         // it will make 40 request becuase of limit and store the results into an array
 
-        for(let i=1; i< 39; i++){
+        for(let i=start; i< start+39; i++) {
             const movieData = await axios.get(`https://api.themoviedb.org/3/discover/movie`,{
                 params : {
                     api_key: TORONTO_MOVIE_FEST_API_KEY,
@@ -34,7 +33,8 @@ class MovieList extends Component {
                     language,
                     sort_by: 'primary_release_date.asc',
                     'primary_release_date.gte': '2019-01-01',
-                    with_original_language: 'en'
+                    with_original_language: 'en',
+                    'primary_release_date.lte':'2019-12-31'
                 }
             });
 
@@ -46,8 +46,10 @@ class MovieList extends Component {
         }
 
         this.setState({
-            movies: arr
+            movies: arr,
+            start: start + 39
         }); 
+        
     }
 
     renderLoader() {
@@ -133,6 +135,11 @@ class MovieList extends Component {
             document.getElementById(ID).appendChild(castContainer);
         }
     }
+
+    loadmore = ()=> {
+        console.log(this.state.start);
+     this.getMovieData(this.state.start);
+    }
     renderMovies() {
         const { movies } = this.state;
         const movieHTML = movies.map( (item, index) => {
@@ -174,6 +181,7 @@ class MovieList extends Component {
     render() {
         return (
             <section className= "movieListComponent">
+                <button value="load more..." onClick={this.loadmore}>Show data</button>
                 <h2> -:Here's The List Of Movie:- </h2>
                 <div className= "movieList">
                     {
@@ -182,7 +190,7 @@ class MovieList extends Component {
                         : this.renderLoader()
                     }   
                 </div>
-                <input type="button" value="load more..." onClick={this.loadmore}/>
+                <button value="load more..." onClick={this.loadmore}>Show data</button>
             </section>
         )
     }
