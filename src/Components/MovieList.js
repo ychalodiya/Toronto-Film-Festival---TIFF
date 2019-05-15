@@ -4,7 +4,6 @@ import axios from 'axios';
 
 const TORONTO_MOVIE_FEST_API_KEY = process.env.REACT_APP_TORONTO_MOVIE_FEST_API_KEY;
 const language = 'en-US';
-
 let arr =[];
 
 class MovieList extends Component {
@@ -44,12 +43,11 @@ class MovieList extends Component {
                     return arr   
             });
         }
-
+        document.getElementById('loadmore').style.visibility = 'visible';
         this.setState({
             movies: arr,
             start: start + 39
-        }); 
-        
+        });   
     }
 
     renderLoader() {
@@ -65,9 +63,10 @@ class MovieList extends Component {
         return roundedHours + " Hour(s) and "+ roundedMinutes + " minute(s)";
     }
 
-    SelectedMovie = async(ID, e) => {
+    SelectedMovie = async ID => {
         let flag = document.getElementById(ID);
         let ans = flag.hasChildNodes();
+
         // Render Cast Container only once.
         if(!ans){
             const cast = await axios.get(`https://api.themoviedb.org/3/movie/${ID}/credits`,{
@@ -83,35 +82,20 @@ class MovieList extends Component {
                 }
             });
 
-            const {tagline, runtime, genres} = tagline_and_runtime.data;
+            const {tagline, runtime, genres, overview, release_date} = tagline_and_runtime.data;
             
-            let taglineHeader = document.createElement('h4');
-            taglineHeader.innerText = 'Tagline: ';
-            document.getElementById(ID).appendChild(taglineHeader);
+            this.createContainer('Release Date: ', release_date, ID);
+            this.createContainer('Description: ', overview, ID);
+            this.createContainer('Tagline: ', tagline, ID);
 
-            let taglineContainer = document.createElement('span');
-            taglineContainer.innerHTML = tagline;
-            taglineHeader.appendChild(taglineContainer);
-
-            let runtimeHeader = document.createElement('h4');
-            runtimeHeader.innerText = 'Runtime: ';
-            document.getElementById(ID).appendChild(runtimeHeader);
-
-            let runtimeContainer = document.createElement('span');
-            runtimeContainer.innerHTML = this.runtimeConverter(runtime);
-            runtimeHeader.appendChild(runtimeContainer);
-
-            let genreHeader = document.createElement('h4');
-            genreHeader.innerText = 'Genres: ';
-            document.getElementById(ID).appendChild(genreHeader);
-
+            let timer = this.runtimeConverter(runtime);
+            this.createContainer('Runtime: ', timer, ID);
+            
             const genreHTML = genres.map( item => {
                 return  item.name;
-            });
+            }).join(", ");
 
-            let genreContainer = document.createElement('span');
-            genreContainer.innerHTML = genreHTML.join(", ");
-            genreHeader.appendChild(genreContainer);
+            this.createContainer('Genres: ', genreHTML, ID);
 
             const castHTML = cast.data.cast.map( item => {
             const {name, profile_path:castimg } = item;
@@ -136,18 +120,29 @@ class MovieList extends Component {
         }
     }
 
-    loadmore = ()=> {
-        console.log(this.state.start);
-     this.getMovieData(this.state.start);
+    createContainer = (title, data, ID) => {
+
+        let lable = document.createElement('h4');
+        lable.innerText = title;
+        document.getElementById(ID).appendChild(lable);
+
+        let lableData = document.createElement('span');
+        lableData.innerHTML = data;
+        lable.appendChild(lableData);
     }
+
+    loadmore = () => {
+        document.getElementById('loadmore').style.visibility = 'hidden';
+        console.log(this.state.start);
+        this.getMovieData(this.state.start);
+    }
+
     renderMovies() {
         const { movies } = this.state;
-        const movieHTML = movies.map( (item, index) => {
+        const movieHTML = movies.map((item, ) => {
         const { 
             original_title: movieName,
-            overview: description,
             popularity,
-            release_date,
             poster_path: image,
             id
         } = item;
@@ -157,8 +152,8 @@ class MovieList extends Component {
                 return(
                     <div key= {id} className= "movieCard"
                         onClick = {
-                            (e) => {
-                                this.SelectedMovie(id, e); 
+                            () => {
+                                this.SelectedMovie(id); 
                             }
                         }
                     >
@@ -166,9 +161,7 @@ class MovieList extends Component {
                             <img src={`https://image.tmdb.org/t/p/w300_and_h450_bestv2${image}`} alt="" />
                         </div>
                         <div className="contentDiv" >
-                            <h2 className="movieName"> Movie Name: { movieName }</h2>
-                            <h4> Release Date: { release_date } </h4>
-                            <p><span className="description">Description:</span> { description }</p>
+                            <h2 className="movieName"> Movie: { movieName }</h2>
                             <div id={id}></div>
                         </div>
                     </div>
@@ -181,7 +174,6 @@ class MovieList extends Component {
     render() {
         return (
             <section className= "movieListComponent">
-                <button value="load more..." onClick={this.loadmore}>Show data</button>
                 <h2> -:Here's The List Of Movie:- </h2>
                 <div className= "movieList">
                     {
@@ -190,7 +182,7 @@ class MovieList extends Component {
                         : this.renderLoader()
                     }   
                 </div>
-                <button value="load more..." onClick={this.loadmore}>Show data</button>
+                <button id="loadmore" value="load more..." onClick={this.loadmore}>Load More Movies</button>
             </section>
         )
     }
