@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/toronto_film_fest/precache-manifest.96f9f67921e87f30b9051ff7c9cbd732.js"
+  "/toronto_film_fest/precache-manifest.071714379a560c186f0ca2abf5802fa2.js"
 );
 
 self.addEventListener('message', (event) => {
