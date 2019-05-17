@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './MovieList.css';
 import axios from 'axios';
+import loader from './loading.gif';
 
 const TORONTO_MOVIE_FEST_API_KEY = process.env.REACT_APP_TORONTO_MOVIE_FEST_API_KEY;
 const language = 'en-US';
@@ -43,15 +44,20 @@ class MovieList extends Component {
                     return arr   
             });
         }
-        document.getElementById('loadmore').style.visibility = 'visible';
-        this.setState({
-            movies: arr,
-            start: start + 39
-        });   
+
+        if(start < 157){
+            document.getElementById('loadmore').style.visibility = 'visible';
+            this.setState({
+                movies: arr,
+                start: start + 39
+            });   
+        } else {
+            document.getElementById('loader').style.visibility = 'hidden';
+        }
     }
 
     renderLoader() {
-        return <p> ...Loading </p>
+        // return  <img id="loader" src={loader} alt="loader"/>
     }
 
     // It will convert minutes into hours and minutes
@@ -134,6 +140,7 @@ class MovieList extends Component {
     loadmore = () => {
         document.getElementById('loadmore').style.visibility = 'hidden';
         console.log(this.state.start);
+        document.getElementById('loader').style.visibility = 'visible';
         this.getMovieData(this.state.start);
     }
 
@@ -168,6 +175,8 @@ class MovieList extends Component {
                 );
             }
         });
+        document.getElementById('loadmore').style.visibility = 'visible';
+        document.getElementById('loader').style.visibility = 'hidden';
         return movieHTML;
     }
 
@@ -175,6 +184,7 @@ class MovieList extends Component {
         return (
             <section className= "movieListComponent">
                 <h2> -:Here's The List Of Movie:- </h2>
+                
                 <div className= "movieList">
                     {
                         this.state.movies.length
@@ -182,7 +192,10 @@ class MovieList extends Component {
                         : this.renderLoader()
                     }   
                 </div>
-                <button id="loadmore" value="load more..." onClick={this.loadmore}>Load More Movies</button>
+                <div>
+                    <button id="loadmore" value="load more..." onClick={this.loadmore}>Load More Movies...</button>
+                </div>
+                <img id="loader" src={loader} alt="loader"/>
             </section>
         )
     }
